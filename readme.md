@@ -1,36 +1,26 @@
-# Nutrition Unofficial Extended life
+# Nutrition-UE (Unofficial Extended)
 
-This is an unofficial fork of [Nutrition](https://github.com/WesCook/Nutrition).
+An unofficial fork of [Nutrition](https://github.com/WesCook/Nutrition) for Minecraft 1.12.2, continuing maintenance and compatibility work under the `com.breakinblocks.nutrition` package.
 
-# Credit
-
-This mod is created using [GregTechCEu's Buildscripts](https://github.com/GregTechCEu/Buildscripts)
-
-# Nutrition
-
-Nutrition is a highly configurable mod to enable the creation of health systems in Minecraft.
-
-[Download](https://github.com/WesCook/Nutrition/releases) | [Wiki](https://github.com/WesCook/Nutrition/wiki) | [Changelog](changelog.md)
+[Releases](https://github.com/Saereth/Nutrition-UE/releases) | [Changelogs](metadata/changelogs/) | [Upstream Wiki](https://github.com/WesCook/Nutrition/wiki)
 
 ![Nutrition GUI](screenshots/gui.png "Nutrition GUI")
 
-Through its [config files](https://github.com/WesCook/Nutrition/wiki/Configuration), Nutrition allows you to define
-custom food groups (called [nutrients](https://github.com/WesCook/Nutrition/wiki/Nutrients)) which
-apply [effects](https://github.com/WesCook/Nutrition/wiki/Effects) based on nutrition levels.
+## About
 
-By default, Nutrition comes configured with the classic five food group system: dairy, fruit, grain, protein, and
-vegetables. However many different systems are possible. Some examples include:
+Nutrition is a highly configurable mod for building food-group / health systems in Minecraft. Through its [config files](https://github.com/WesCook/Nutrition/wiki/Configuration), you can define custom food groups (called [nutrients](https://github.com/WesCook/Nutrition/wiki/Nutrients)) that apply [effects](https://github.com/WesCook/Nutrition/wiki/Effects) based on how balanced a player's diet is.
 
-* A spicy tolerance bar, where eating enough spicy foods will grant a permanent resistance to fire.
+By default it ships with the classic five-food-group system — dairy, fruit, grain, protein, and vegetables — but the config is flexible enough to model very different ideas:
+
+* A spicy-tolerance bar where eating enough spicy foods grants permanent fire resistance.
 * A zombie simulation where you must eat brains to avoid negative effects.
-* Gluten intolerance. Eat bread, get sick.
+* Gluten intolerance — eat bread, get sick.
 
-When updating the mod, please delete your `/config/nutrition/nutrients/` directory to receive new mod support. This is
-necessary so we don't overwrite any customizations.
+> **Updating:** delete `/config/nutrition/nutrients/` when updating the mod to pick up new mod support. Without this, your existing customizations would otherwise be preserved over the new defaults.
 
 ## Mods Supported
 
-Mods that are supported with the default five-food group system include:
+Default five-food-group mappings are shipped for:
 
 * [AbyssalCraft](https://www.curseforge.com/minecraft/mc-mods/abyssalcraft)
 * [Actually Additions](https://www.curseforge.com/minecraft/mc-mods/actually-additions)
@@ -114,14 +104,24 @@ Mods that are supported with the default five-food group system include:
 * [Tinkers Construct](https://www.curseforge.com/minecraft/mc-mods/tinkers-construct)
 * [Tiny Progressions](https://www.curseforge.com/minecraft/mc-mods/tiny-progressions)
 * [Tropicraft](https://www.curseforge.com/minecraft/mc-mods/tropicraft)
-* [Twilight Forest](https://www.curseforge.com/minecraft/mc-mods/the-twilight-forest)
 * [VanillaFoodPantry](https://www.curseforge.com/minecraft/mc-mods/vanillafoodpantry-mod)
 * [XL Food Mod](https://www.curseforge.com/minecraft/mc-mods/xl-food-mod)
 * [Zoo & Wild Animals Rebuilt](https://www.curseforge.com/minecraft/mc-mods/zoo-wild-animals-rebuild)
 
-Mod support contributions are welcome!  Please create a [Pull Request](https://github.com/WesCook/Nutrition/pulls) or
-an [Issue](https://github.com/WesCook/Nutrition/issues) with the relevant .json files.
+New mod-support contributions are welcome — open a [Pull Request](https://github.com/Saereth/Nutrition-UE/pulls) or [Issue](https://github.com/Saereth/Nutrition-UE/issues) against this fork with the relevant `.json` files.
 
-## Credits:
+## Building
 
-- [GTCEu Buildscripts](https://github.com/GregTechCEu/Buildscripts) for the amazing buildscripts
+This project uses Gradle with the [GregTechCEu Buildscripts](https://github.com/GregTechCEu/Buildscripts) toolchain.
+
+```bash
+./gradlew build       # produces build/libs/Nutrition-UEL-<mcver>-<modver>.jar
+./gradlew runClient   # dev client
+./gradlew runServer   # dev server
+```
+
+## Credits
+
+* [WesCook](https://github.com/WesCook) — original author of [Nutrition](https://github.com/WesCook/Nutrition).
+* [GregTechCEu Buildscripts](https://github.com/GregTechCEu/Buildscripts) — build toolchain.
+* All upstream and downstream contributors listed in git history.

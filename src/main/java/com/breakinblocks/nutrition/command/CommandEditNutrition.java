@@ -1,0 +1,159 @@
+package com.breakinblocks.nutrition.command;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+
+import net.minecraft.client.resources.I18n;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.command.WrongUsageException;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
+import com.breakinblocks.nutrition.Tags;
+import com.breakinblocks.nutrition.api.NutritionUtil;
+import com.breakinblocks.nutrition.nutrients.Nutrient;
+import com.breakinblocks.nutrition.nutrients.Nutrient.ScaledItemStack;
+import com.breakinblocks.nutrition.nutrients.NutrientList;
+import com.breakinblocks.nutrition.nutrients.NutritionUtilImpl;
+import com.breakinblocks.nutrition.utility.DataUpdater;
+
+public class CommandEditNutrition extends CommandBase {
+
+    @Override
+    public int getRequiredPermissionLevel() {
+        return 2;
+    }
+
+    @Override
+    public String getName() {
+        return "nutrition-food";
+    }
+
+    @Override
+    public String getUsage(ICommandSender sender) {
+        return getName() + " [add|remove <nutrient> [...]]";
+    }
+
+    @Override
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
+                                          @Nullable BlockPos targetPos) {
+        if (args.length == 1) {
+            return getListOfStringsMatchingLastWord(args, "add", "remove");
+        }
+        if (args.length == 2) {
+            return getListOfStringsMatchingLastWord(args,
+                    NutrientList.get().stream().map(nutrient -> nutrient.name).collect(Collectors.toList()));
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+        if (sender instanceof EntityPlayer player) {
+            ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);
+            if (!NutritionUtil.isValidFood(heldItem)) {
+                throw new CommandException("Holding item is not food!");
+            }
+            switch (args.length) {
+                case 0 -> sender.sendMessage(new TextComponentString(createInfo(heldItem, player)));
+                case 2, 3 -> {
+                    String type = args[0];
+                    switch (type) {
+                        case "add" -> {
+                            Nutrient nutrient = getNutrient(args);
+                            if (args.length == 2) {
+                                if (nutrient.getScaledItemStack(heldItem) != null)
+                                    throw new CommandException(
+                                            args[1] + " is already added to " + heldItem.getItem().getRegistryName() +
+                                                    "!");
+                                nutrient.addScaledItemStack(new ScaledItemStack(heldItem, 1));
+                                DataUpdater.add(nutrient, new ScaledItemStack(heldItem, 1));
+                                sender.sendMessage(new TextComponentString(
+                                        args[1] + " is added to " + heldItem.getItem().getRegistryName()));
+                            } else {
+                                float scale = (float) parseDouble(args[2], 0);
+                                ScaledItemStack scaledItemStack = new ScaledItemStack(heldItem, scale);
+                                if (nutrient.addOrReplaceScaledItemStack(scaledItemStack)) {
+                                    DataUpdater.add(nutrient, scaledItemStack);
+                                } else {
+                                    DataUpdater.edit(nutrient, scaledItemStack);
+                                }
+                            }
+                        }
+                        case "remove" -> {
+                            Nutrient nutrient = getNutrient(args);
+                            ScaledItemStack removed = nutrient.removeScaledItemStack(heldItem);
+                            if (removed == null)
+                                throw new CommandException(
+                                        heldItem.getItem().getRegistryName() + "doesn't have " + args[1]);
+                            DataUpdater.remove(nutrient, removed);
+                            sender.sendMessage(new TextComponentString(
+                                    args[1] + " is removed from " + heldItem.getItem().getRegistryName()));
+                        }
+                    }
+                }
+                default -> throw new WrongUsageException(getUsage(sender));
+            }
+        }
+    }
+
+    @NotNull
+    private static Nutrient getNutrient(String[] args) throws CommandException {
+        if (args[1].isEmpty()) {
+            switch (args[0]) {
+                case "add" -> throw new WrongUsageException("add <nutrient> [<scale>]");
+                case "remove" -> throw new WrongUsageException("remove <nutrient>");
+            }
+        }
+        Nutrient nutrient = NutrientList.getByName(args[1]);
+        if (nutrient == null)
+            throw new CommandException("Unknown nutrient:" + args[1]);
+        return nutrient;
+    }
+
+    private static String createInfo(ItemStack itemStack, EntityPlayer player) {
+        Multimap<Float, Nutrient> nutritionValue2Nutrient = ArrayListMultimap.create();
+        for (Entry<Nutrient, Float> entry : NutritionUtilImpl.calculateNutrition(itemStack, player)
+                .entrySet()) {
+            nutritionValue2Nutrient.put(entry.getValue(), entry.getKey());
+        }
+        List<String> list = new ArrayList<>();
+        for (Float key : nutritionValue2Nutrient.keySet()) {
+            list.add(createTooltip(key, nutritionValue2Nutrient.get(key)));
+        }
+        if (list.isEmpty())
+            return itemStack.getItem().getRegistryName() + " has no nutrients";
+        return StringUtils.join(list, ", ");
+    }
+
+    private static String createTooltip(float nutritionValue, Collection<Nutrient> nutrients) {
+        StringJoiner stringJoiner = new StringJoiner(", ");
+        for (Nutrient nutrient : nutrients) // Loop through nutrients from food
+        {
+            if (nutrient.visible)
+                stringJoiner.add(I18n.format("nutrient." + Tags.MODID + ":" + nutrient.name));
+        }
+        String nutrientString = stringJoiner.toString();
+        return I18n.format("tooltip." + Tags.MODID + ":nutrients") + " " + TextFormatting.DARK_GREEN + nutrientString +
+                TextFormatting.DARK_AQUA + " (" + String.format("%.1f", nutritionValue) + "%)";
+    }
+}

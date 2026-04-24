@@ -1,0 +1,171 @@
+package ca.wescook.nutrition.events;
+
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.block.BlockCake;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBucketMilk;
+import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import ca.wescook.nutrition.api.INutritionFood;
+import ca.wescook.nutrition.api.NutrientApplicationPhase;
+import ca.wescook.nutrition.api.NutritionUtil;
+import ca.wescook.nutrition.capabilities.INutrientManager;
+import ca.wescook.nutrition.effects.EffectsManager;
+import ca.wescook.nutrition.nutrients.FoodHintList;
+import ca.wescook.nutrition.nutrients.Nutrient;
+import ca.wescook.nutrition.nutrients.NutritionAdapterManager;
+import ca.wescook.nutrition.nutrients.NutritionUtilImpl;
+import ca.wescook.nutrition.proxy.ClientProxy;
+import ca.wescook.nutrition.utility.Config;
+
+public class EventEatFood {
+
+    @CapabilityInject(INutrientManager.class)
+    private static final Capability<INutrientManager> NUTRITION_CAPABILITY = null;
+
+    // Detect eating cake
+    @SubscribeEvent
+    public void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        EntityPlayer player = (EntityPlayer) event.getEntity();
+
+        // Get info
+        World world = event.getWorld();
+        IBlockState blockState = world.getBlockState(event.getPos());
+
+        // Get out if not cake
+        if (!(blockState.getBlock() instanceof BlockCake)) {
+            return;
+        }
+
+        // Should we let them eat cake?
+        if (player.canEat(false) || Config.allowOverEating) {
+            // Calculate nutrition
+            Item item = Item.getByNameOrId(blockState.getBlock().getRegistryName().toString()); // Get cake Item from
+            // registry name
+            ItemStack itemStack = new ItemStack(item);
+            Map<Nutrient, Float> nutrientValues = NutritionUtilImpl.calculateNutrition(itemStack, player);
+
+            // Add to each nutrient
+            if (!player.getEntityWorld().isRemote) // Server
+                player.getCapability(NUTRITION_CAPABILITY, null).add(nutrientValues);
+            else // Client
+                ClientProxy.localNutrition.add(nutrientValues);
+
+            // If full but over-eating, simulate cake eating
+            if (!player.getEntityWorld().isRemote && !player.canEat(false) && Config.allowOverEating) {
+                int cakeBites = blockState.getValue(BlockCake.BITES);
+                if (cakeBites < 6)
+                    world.setBlockState(event.getPos(), blockState.withProperty(BlockCake.BITES, cakeBites + 1), 3);
+                else
+                    world.setBlockToAir(event.getPos());
+            }
+        }
+    }
+
+    // Allow food to be consumed regardless of hunger level
+    @SubscribeEvent
+    public void startUsingItem(PlayerInteractEvent.RightClickItem event) {
+        // Only run on server
+        EntityPlayer player = (EntityPlayer) event.getEntity();
+        if (player.getEntityWorld().isRemote)
+            return;
+
+        // Interacting with item?
+        ItemStack itemStack = event.getItemStack();
+        if (itemStack == null)
+            return;
+
+        // Is item food?
+        INutritionFood iNutritionFood = toINutritionFood(itemStack);
+        if (iNutritionFood != null) {
+            // If config allows, mark food as edible
+            if (Config.allowOverEating)
+                iNutritionFood.setAlwaysEdible(itemStack, player);
+        } else if (itemStack.getItem() instanceof ItemFood itemFood) {
+            // If config allows, mark food as edible
+            if (Config.allowOverEating)
+                itemFood.setAlwaysEdible();
+        }
+
+        // Apply nutrients
+        boolean applyNow = false;
+        NutrientApplicationPhase nutrientApplicationPhase = FoodHintList.getNutrientApplicationPhase(itemStack);
+        if (nutrientApplicationPhase != null) {
+            if (nutrientApplicationPhase == NutrientApplicationPhase.ON_RIGHT_CLICK)
+                applyNow = true;
+        } else if (iNutritionFood != null) {
+            if (iNutritionFood.getNutrientApplicationPhase(itemStack) == NutrientApplicationPhase.ON_RIGHT_CLICK)
+                applyNow = true;
+        }
+        if (applyNow) {
+            NutritionUtil.addNutrientsToPlayer(player, itemStack);
+            reapplyEffectsFromMilk(player, itemStack);
+        }
+    }
+
+    // Calculate nutrition after finishing eating and reapply effects if appropriate
+    @SubscribeEvent
+    public void finishUsingItem(LivingEntityUseItemEvent.Finish event) {
+        // Only check against players
+        if (!(event.getEntity() instanceof EntityPlayer player))
+            return;
+
+        // Get ItemStack of eaten food
+        ItemStack itemStack = event.getItem();
+
+        // Apply actions to item
+        boolean applyNow = true;
+        NutrientApplicationPhase nutrientApplicationPhase = FoodHintList.getNutrientApplicationPhase(itemStack);
+        if (nutrientApplicationPhase != null) {
+            if (nutrientApplicationPhase != NutrientApplicationPhase.FINISH_USING)
+                applyNow = false;
+        } else {
+            INutritionFood iNutritionFood = toINutritionFood(itemStack);
+            if (iNutritionFood != null) {
+                if (iNutritionFood.getNutrientApplicationPhase(itemStack) != NutrientApplicationPhase.FINISH_USING)
+                    applyNow = false;
+            }
+        }
+        if (applyNow) {
+            NutritionUtil.addNutrientsToPlayer(player, itemStack);
+            reapplyEffectsFromMilk(player, itemStack);
+        }
+    }
+
+    // If milk clears effects, reapply immediately
+    private void reapplyEffectsFromMilk(EntityPlayer player, ItemStack itemStack) {
+        // Server only
+        if (player.getEntityWorld().isRemote)
+            return;
+
+        // Only continue if milk bucket (curative item)
+        if (!(itemStack.getItem() instanceof ItemBucketMilk))
+            return;
+
+        // Reapply effects
+        EffectsManager.reapplyEffects(player);
+    }
+
+    // Convert to INutritionFood
+    @Nullable
+    private static INutritionFood toINutritionFood(ItemStack itemStack) {
+        INutritionFood iNutritionFood = NutritionAdapterManager.apply(itemStack);
+        if (iNutritionFood != null)
+            return iNutritionFood;
+        if (itemStack.getItem() instanceof INutritionFood)
+            return (INutritionFood) itemStack.getItem();
+        return null;
+    }
+}

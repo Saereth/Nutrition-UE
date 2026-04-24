@@ -1,6 +1,6 @@
 # Nutrition-UE (Unofficial Extended)
 
-An unofficial fork of [Nutrition](https://github.com/WesCook/Nutrition) for Minecraft 1.12.2, continuing maintenance and compatibility work under the `com.breakinblocks.nutrition` package.
+An unofficial fork of [Nutrition](https://github.com/WesCook/Nutrition) for Minecraft 1.12.2, continuing maintenance and compatibility work. The runtime package remains `ca.wescook.nutrition` so existing dependents (Magiculture Integrations, JustEnoughMagiculture, etc.) keep working drop-in.
 
 [Releases](https://github.com/Saereth/Nutrition-UE/releases) | [Changelogs](metadata/changelogs/) | [Upstream Wiki](https://github.com/WesCook/Nutrition/wiki)
 

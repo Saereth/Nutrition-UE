@@ -1,0 +1,33 @@
+{
+  "attribute_modifiers": [
+    {
+      "amount": -2.0,
+      "attribute": "minecraft:generic.max_health",
+      "operation": "add_value"
+    },
+    {
+      "amount": -0.1,
+      "attribute": "nutritional:nutrient_absorption",
+      "operation": "add_value"
+    }
+  ],
+  "condition": {
+    "average": {
+      "max": 30.0
+    },
+    "combine": "any",
+    "minimum": {
+      "max": 15.0
+    }
+  },
+  "display": {
+    "color": "#e57373",
+    "icon": "minecraft:rotten_flesh",
+    "name": "tier.nutritional.malnourished"
+  },
+  "messages": {
+    "enter": "tier.nutritional.malnourished.enter",
+    "exit": "tier.nutritional.malnourished.exit"
+  },
+  "priority": 25
+}

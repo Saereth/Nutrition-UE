@@ -1,0 +1,8 @@
+{
+  "max": 15.0,
+  "min": 0.0,
+  "mob_effect": "minecraft:weakness",
+  "nutrients": [
+    "nutritional:protein"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "criteria": {
+    "eat_anything": {
+      "conditions": {
+        "item": {
+          "items": "#nutritional:nutrient/fruit"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancement.nutritional.root.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:bread"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancement.nutritional.root"
+    }
+  },
+  "requirements": [
+    [
+      "eat_anything"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

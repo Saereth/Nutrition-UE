@@ -1,0 +1,32 @@
+{
+  "attribute_modifiers": [
+    {
+      "amount": 2.0,
+      "attribute": "minecraft:generic.max_health",
+      "operation": "add_value"
+    },
+    {
+      "amount": -0.1,
+      "attribute": "nutritional:nutrient_decay_rate",
+      "operation": "add_value"
+    }
+  ],
+  "condition": {
+    "average": {
+      "min": 60.0
+    },
+    "minimum": {
+      "min": 40.0
+    }
+  },
+  "display": {
+    "color": "#4caf50",
+    "icon": "minecraft:bread",
+    "name": "tier.nutritional.nourished"
+  },
+  "messages": {
+    "enter": "tier.nutritional.nourished.enter",
+    "exit": "tier.nutritional.nourished.exit"
+  },
+  "priority": 75
+}

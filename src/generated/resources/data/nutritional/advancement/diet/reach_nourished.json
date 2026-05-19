@@ -1,0 +1,30 @@
+{
+  "parent": "nutritional:diet/root",
+  "criteria": {
+    "reach_tier": {
+      "conditions": {
+        "tier": "nutritional:nourished"
+      },
+      "trigger": "nutritional:tier_reached"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.nutritional.reach_nourished.desc"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:bread"
+    },
+    "title": {
+      "translate": "advancement.nutritional.reach_nourished"
+    }
+  },
+  "requirements": [
+    [
+      "reach_tier"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

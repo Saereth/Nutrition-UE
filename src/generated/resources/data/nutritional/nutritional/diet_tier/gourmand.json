@@ -1,0 +1,37 @@
+{
+  "attribute_modifiers": [
+    {
+      "amount": 4.0,
+      "attribute": "minecraft:generic.max_health",
+      "operation": "add_value"
+    },
+    {
+      "amount": 0.1,
+      "attribute": "nutritional:nutrient_absorption",
+      "operation": "add_value"
+    },
+    {
+      "amount": -0.2,
+      "attribute": "nutritional:nutrient_decay_rate",
+      "operation": "add_value"
+    }
+  ],
+  "condition": {
+    "average": {
+      "min": 85.0
+    },
+    "minimum": {
+      "min": 70.0
+    }
+  },
+  "display": {
+    "color": "#fbc02d",
+    "icon": "minecraft:golden_apple",
+    "name": "tier.nutritional.gourmand"
+  },
+  "messages": {
+    "enter": "tier.nutritional.gourmand.enter",
+    "exit": "tier.nutritional.gourmand.exit"
+  },
+  "priority": 100
+}

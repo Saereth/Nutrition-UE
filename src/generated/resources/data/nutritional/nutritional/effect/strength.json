@@ -1,0 +1,8 @@
+{
+  "max": 100.0,
+  "min": 85.0,
+  "mob_effect": "minecraft:strength",
+  "nutrients": [
+    "nutritional:protein"
+  ]
+}

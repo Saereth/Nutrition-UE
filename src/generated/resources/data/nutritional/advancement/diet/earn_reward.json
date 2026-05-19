@@ -1,0 +1,30 @@
+{
+  "parent": "nutritional:diet/reach_nourished",
+  "criteria": {
+    "earn_reward": {
+      "trigger": "nutritional:reward_earned"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.nutritional.earn_reward.desc"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:golden_apple"
+    },
+    "title": {
+      "translate": "advancement.nutritional.earn_reward"
+    }
+  },
+  "requirements": [
+    [
+      "earn_reward"
+    ]
+  ],
+  "rewards": {
+    "experience": 100
+  },
+  "sends_telemetry_event": true
+}

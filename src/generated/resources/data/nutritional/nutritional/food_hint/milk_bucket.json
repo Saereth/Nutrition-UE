@@ -1,0 +1,6 @@
+{
+  "heal_amount": 4.0,
+  "match": {
+    "item": "minecraft:milk_bucket"
+  }
+}

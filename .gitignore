@@ -79,5 +79,22 @@ local.properties
 *~
 
 run/
+runs/
 
 logs/
+
+# Datagen caches
+src/generated/resources/.cache/
+**/.cache/
+*.hash
+
+# Local screenshots / scratch
+/screen.png
+/screenshots-local/
+
+# Documentation — keep working notes local; only publish curated docs
+*.md
+!readme.md
+!README.md
+!metadata/changelogs/*.md
+

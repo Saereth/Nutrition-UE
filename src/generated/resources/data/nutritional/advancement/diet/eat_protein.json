@@ -1,0 +1,31 @@
+{
+  "parent": "nutritional:diet/root",
+  "criteria": {
+    "consume": {
+      "conditions": {
+        "item": {
+          "items": "#nutritional:nutrient/protein"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.nutritional.eat_protein.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:cooked_beef"
+    },
+    "title": {
+      "translate": "advancement.nutritional.eat_protein"
+    }
+  },
+  "requirements": [
+    [
+      "consume"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

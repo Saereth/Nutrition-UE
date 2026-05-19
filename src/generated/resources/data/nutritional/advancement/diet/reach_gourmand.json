@@ -1,0 +1,33 @@
+{
+  "parent": "nutritional:diet/reach_nourished",
+  "criteria": {
+    "reach_tier": {
+      "conditions": {
+        "tier": "nutritional:gourmand"
+      },
+      "trigger": "nutritional:tier_reached"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.nutritional.reach_gourmand.desc"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:enchanted_golden_apple"
+    },
+    "title": {
+      "translate": "advancement.nutritional.reach_gourmand"
+    }
+  },
+  "requirements": [
+    [
+      "reach_tier"
+    ]
+  ],
+  "rewards": {
+    "experience": 200
+  },
+  "sends_telemetry_event": true
+}

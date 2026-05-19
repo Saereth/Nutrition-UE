@@ -1,0 +1,31 @@
+{
+  "parent": "nutritional:diet/root",
+  "criteria": {
+    "consume": {
+      "conditions": {
+        "item": {
+          "items": "#nutritional:nutrient/vegetable"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.nutritional.eat_vegetable.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:carrot"
+    },
+    "title": {
+      "translate": "advancement.nutritional.eat_vegetable"
+    }
+  },
+  "requirements": [
+    [
+      "consume"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

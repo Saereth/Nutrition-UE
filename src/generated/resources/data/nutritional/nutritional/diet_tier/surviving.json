@@ -1,0 +1,13 @@
+{
+  "condition": {
+    "average": {
+      "min": 30.0
+    }
+  },
+  "display": {
+    "color": "#bdbdbd",
+    "icon": "minecraft:wheat",
+    "name": "tier.nutritional.surviving"
+  },
+  "priority": 50
+}

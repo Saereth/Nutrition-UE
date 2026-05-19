@@ -1,0 +1,31 @@
+{
+  "parent": "nutritional:diet/root",
+  "criteria": {
+    "consume": {
+      "conditions": {
+        "item": {
+          "items": "#nutritional:nutrient/grain"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.nutritional.eat_grain.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:bread"
+    },
+    "title": {
+      "translate": "advancement.nutritional.eat_grain"
+    }
+  },
+  "requirements": [
+    [
+      "consume"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

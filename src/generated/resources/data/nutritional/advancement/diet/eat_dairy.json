@@ -1,0 +1,33 @@
+{
+  "parent": "nutritional:diet/root",
+  "criteria": {
+    "consume": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#nutritional:nutrient/dairy"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.nutritional.eat_dairy.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:milk_bucket"
+    },
+    "title": {
+      "translate": "advancement.nutritional.eat_dairy"
+    }
+  },
+  "requirements": [
+    [
+      "consume"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
